@@ -1,0 +1,20 @@
+{
+  "author": "Zp Bappi (http://zpbappi.com)",
+  "name": "gulp-chutzpah",
+  "keywords": [
+    "gulp",
+    "chutzpah"
+  ],
+  "description": "A gulp plugin to run javascript tests using Chutzpah test runner",
+  "version": "1.0.0",
+  "homepage": "https://github.com/zpbappi/gulp-chutzpah",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zpbappi/gulp-chutzpah.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    
+  },
+  "license": "MIT"
+}

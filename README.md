@@ -1,2 +1,2 @@
 # gulp-chutzpah
-A gulp to run javascript tests using Chutzpah test runner
+A gulp plugin to run javascript tests using Chutzpah test runner
