@@ -1,4 +1,4 @@
-# gulp-chutzpah
+# gulp-chutzpah [![Build Status](https://travis-ci.org/zpbappi/gulp-chutzpah.svg?branch=master)](https://travis-ci.org/zpbappi/gulp-chutzpah)
 A gulp plugin to run javascript tests using Chutzpah test runner
 
 ## Installation
