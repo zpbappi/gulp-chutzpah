@@ -13,12 +13,23 @@
     "type": "git",
     "url": "https://github.com/zpbappi/gulp-chutzpah.git"
   },
+  "files": [
+      "index.js"
+  ],
   "dependencies": {
       "gulp-util": "^3.0.7",
       "through2": "^2.0.0"
   },
   "devDependencies": {
-      "gulp": "^3.9.0"
+      "gulp": "^3.9.0",
+      "mocha": "^2.3.4",
+      "should": "^8.1.1",
+      "stream-assert": "^2.0.3",
+      "into-stream": "^2.0.0",
+      "q": "^1.4.1" 
+  },
+  "scripts": {
+      "test": "node ./node_modules/mocha/bin/mocha ./test.js"
   },
   "license": "MIT"
 }

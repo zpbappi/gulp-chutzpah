@@ -14,7 +14,7 @@ var gulp = require("gulp"),
     chutzpah = require("gulp-chutzpah");
 
 var opts = {
-    executable: "PATH_TO_CHUTZPAH_RUNNER_EXE"
+    executable: "/path/to/chutzpah.runner.exe"
 };
 
 gulp.task("test", function(){
@@ -43,7 +43,7 @@ Here are the options again with their default values:
 - `openInBrowser` : Launch the tests in a browser. Default is `false`. Set `true` to launch in default browser. 
 You can also set it to your desired browser name like `"IE"`, `"Firefox"` or `"Chrome"`.
 - `parallelism` : Max degree of parallelism for Chutzpah. Default is `false`. Set it any number you want. 
-You can also set it to `true`, which will be treated as `number of CPUs + 1`. Note that, if it set to more than 1 the test output may be a bit jumbled.
+You can also set it to `true`, which will be treated as `number of CPUs + 1`. Note that, if it set to more than 1, the test output may be a bit jumbled.
 - `vsoutput` : Print output in a format that the VS error list recognizes. Default is `false`.
 - `coverage` : Enable coverage collection. Default is `false`.
 - `showFailureReport` : Show a failure report after the test run. Usefull if you have a large number of tests. Default is `false`.
@@ -54,3 +54,8 @@ Specify more than one to add multiple environments. Example value: `"settingsFil
 - `trx` : output results to Visual Studio Trx file. Default is `""`. Set a file path to generate the file. 
 - `nunit2` : output results to NUnit-style XML file. Default is `""`. Set a file path to generate the file.
 - `coveragehtml` : Outputs default Chutzpah coverage HTML. Default is `""`. Set a file path to generate the file.
+
+_Psst! There is however another hidden option called `testExecutor`. 
+You do not need to worry about it when using the library. 
+It was only added to facilitate testing. 
+You can see how it is used in the [test.js](https://github.com/zpbappi/gulp-chutzpah/blob/master/test.js) file._

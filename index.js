@@ -1,8 +1,9 @@
 "use strict";
 
-var gutil = require('gulp-util'),
-    through = require('through2'),
-    exec = require('child_process').exec;
+var gutil = require("gulp-util"),
+    through = require("through2"),
+    exec = require("child_process").exec,
+    shallowCopy = require("util")._extend;
 
 var defaultOpts = {
     nologo: false,
@@ -50,15 +51,17 @@ var isValidProperty = function(baseOpts, userOpts, propertyName){
 var getCommandLineOptionArgString = function(opts, files){
     var arg = "";
     files = files || [];
-    
+
     for (var key in opts) {
         if (!opts.hasOwnProperty(key)) 
             continue;
             
         if(typeof opts[key] === "boolean")
             arg += opts[key] ? " /" + key : "";
-        else if(typeof opts[key] === "string" || typeof opts[key] === "number")
-            arg += opts[key].length ? (" /" + key + " " + opts[key]) : "";                
+        else if(typeof opts[key] === "string")
+            arg += opts[key].length ? (" /" + key + " " + opts[key]) : "";
+        else if(typeof opts[key] === "number")
+            arg += " /" + key + " " + opts[key];                
     }
     
     files.forEach(function(file) {
@@ -68,9 +71,14 @@ var getCommandLineOptionArgString = function(opts, files){
     return arg;
 };
 
+var resolveExecutor = function(userOpts){
+    if(userOpts && typeof userOpts.testExecutor === "function")
+        return userOpts.testExecutor;
+        
+    return exec;
+};
+
 var chutzpahRunner = function(userOpts){
-    var files = [];
-    
     if(!userOpts || typeof userOpts["executable"] !== "string" || userOpts["executable"].length === 0){
         throw new gutil.PluginError({
             plugin: "gulp-chutzpah",
@@ -78,7 +86,10 @@ var chutzpahRunner = function(userOpts){
         });
     }
     
-    var opts = getCombinedOpts(defaultOpts, userOpts);
+    var files = [];
+    var opts = shallowCopy({}, defaultOpts); 
+    opts = getCombinedOpts(opts, userOpts);
+    var executor = resolveExecutor(userOpts);
     
     return through.obj(
         function(file, encoding, callback){
@@ -89,7 +100,7 @@ var chutzpahRunner = function(userOpts){
         },
         function(callback){
             var args = getCommandLineOptionArgString(opts, files);
-            exec(userOpts.executable + args, function(err, stdout, stderr){
+            executor(userOpts.executable + args, function(err, stdout, stderr){
                 console.log(stdout);
                 console.error(stderr);
                 callback(err);
