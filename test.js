@@ -135,7 +135,7 @@ describe("gulp-chutzpah", function(){
             }).should.eventually.containEql(" /openInBrowser Chrome");
         });
         
-        it("should work wth different type of parameters", function(){
+        it("should work with different types of parameters together", function(){
             return getCommandStringPromise({
                 "parallelism": 4,
                 "openInBrowser": true,
