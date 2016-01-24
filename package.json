@@ -7,7 +7,7 @@
     "gulpplugin"
   ],
   "description": "A gulp plugin to run javascript tests using Chutzpah test runner",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homepage": "https://github.com/zpbappi/gulp-chutzpah",
   "repository": {
     "type": "git",
