@@ -26,7 +26,8 @@
       "should": "^8.1.1",
       "stream-assert": "^2.0.3",
       "into-stream": "^2.0.0",
-      "q": "^1.4.1" 
+      "q": "^1.4.1" ,
+      "proxyquire": "^1.7.3"
   },
   "scripts": {
       "test": "node ./node_modules/mocha/bin/mocha ./test.js"

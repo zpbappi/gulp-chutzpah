@@ -54,8 +54,3 @@ Specify more than one to add multiple environments. Example value: `"settingsFil
 - `trx` : output results to Visual Studio Trx file. Default is `""`. Set a file path to generate the file. 
 - `nunit2` : output results to NUnit-style XML file. Default is `""`. Set a file path to generate the file.
 - `coveragehtml` : Outputs default Chutzpah coverage HTML. Default is `""`. Set a file path to generate the file.
-
-_Psst! There is however another hidden option called `testExecutor`. 
-You do not need to worry about it when using the library. 
-It was only added to facilitate testing. 
-You can see how it is used in the [test.js](https://github.com/zpbappi/gulp-chutzpah/blob/master/test.js) file._

@@ -3,7 +3,13 @@ var gulp = require("gulp"),
     assert = require("stream-assert"),
     intoStream = require("into-stream"),
     Q = require("q"),
+    proxyquire = require("proxyquire"),
     chutzpah = require("./index.js");
+
+
+function getChutzpahWithProxy(proxyObj){
+    return proxyquire("./index.js", proxyObj);
+};
     
 
 describe("gulp-chutzpah", function(){
@@ -35,9 +41,9 @@ describe("gulp-chutzpah", function(){
         var pluginStream = null;
         
         beforeEach(function(){
+            var chutzpah = getChutzpahWithProxy({ "child_process": {"exec": function() {} } });
             pluginStream = chutzpah({
-                "executable": "/path/to/chutzpah.runner.exe",
-                "testExecutor": function(command){}
+                "executable": "/path/to/chutzpah.runner.exe"
             });
         });
         
@@ -70,6 +76,7 @@ describe("gulp-chutzpah", function(){
         
         it("should not add any content", function(done){
             intoStream(["lorem", "ipsum"])
+            .pipe(pluginStream)
             .pipe(assert.length(2))
             .pipe(assert.end(done))
             .end();
@@ -84,6 +91,7 @@ describe("gulp-chutzpah", function(){
             };
             
             intoStream.obj(["lorem", "ipsum", "dolor", 42])
+            .pipe(pluginStream)
             .pipe(assert.first(shouldBe("lorem")))
             .pipe(assert.second(shouldBe("ipsum")))
             .pipe(assert.nth(2, shouldBe("dolor")))
@@ -97,11 +105,12 @@ describe("gulp-chutzpah", function(){
         
         function getCommandStringPromise(optionalConfigs){
             var deferred = Q.defer();
+            var chutzpah = getChutzpahWithProxy({"child_process": {"exec": function(command){
+                deferred.resolve(command);
+            }}});
+            
             if(typeof optionalConfigs.executable !== "string")
                 optionalConfigs.executable = "/path/to/chutzpah.runner.exe"
-            optionalConfigs.testExecutor = function(command){
-                deferred.resolve(command);
-            };
             
             gulp.src("index.js")
             .pipe(chutzpah(optionalConfigs))
@@ -110,6 +119,7 @@ describe("gulp-chutzpah", function(){
             
             return deferred.promise;
         };
+        
         
         it("should ignore unknown parameters", function(){
             return getCommandStringPromise({

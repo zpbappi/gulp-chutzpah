@@ -71,13 +71,6 @@ var getCommandLineOptionArgString = function(opts, files){
     return arg;
 };
 
-var resolveExecutor = function(userOpts){
-    if(userOpts && typeof userOpts.testExecutor === "function")
-        return userOpts.testExecutor;
-        
-    return exec;
-};
-
 var chutzpahRunner = function(userOpts){
     if(!userOpts || typeof userOpts["executable"] !== "string" || userOpts["executable"].length === 0){
         throw new gutil.PluginError({
@@ -89,7 +82,6 @@ var chutzpahRunner = function(userOpts){
     var files = [];
     var opts = shallowCopy({}, defaultOpts); 
     opts = getCombinedOpts(opts, userOpts);
-    var executor = resolveExecutor(userOpts);
     
     return through.obj(
         function(file, encoding, callback){
@@ -100,7 +92,7 @@ var chutzpahRunner = function(userOpts){
         },
         function(callback){
             var args = getCommandLineOptionArgString(opts, files);
-            executor(userOpts.executable + args, function(err, stdout, stderr){
+            exec(userOpts.executable + args, function(err, stdout, stderr){
                 console.log(stdout);
                 console.error(stderr);
                 callback(err);
