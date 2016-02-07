@@ -65,7 +65,7 @@ var getCommandLineOptionArgString = function(opts, files){
     }
     
     files.forEach(function(file) {
-        arg += " /path " + file;
+        arg += " /path \"" + file + "\"";
     }, this);
     
     return arg;
