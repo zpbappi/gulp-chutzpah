@@ -18,7 +18,7 @@ var defaultOpts = {
     vsoutput: false,
     coverage: false,
     showFailureReport: false,
-    settingsFileEnvironment: false,
+    settingsFileEnvironment: "",
     junit: "",
     lcov: "",
     trx: "",
