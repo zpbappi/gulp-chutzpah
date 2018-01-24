@@ -14,7 +14,7 @@ var gulp = require("gulp"),
     chutzpah = require("gulp-chutzpah");
 
 var opts = {
-    executable: "/path/to/chutzpah.runner.exe"
+    executable: "/path/to/chutzpah.console.exe"
 };
 
 gulp.task("test", function(){
@@ -26,7 +26,7 @@ gulp.task("test", function(){
 ## Options
 
 The options object must have a property named `executable`, which is the location of 
-your chutzpah runner executable file. 
+your chutzpah console executable file. Usually, it is `chutzpah.console.exe`.
 
 You can optionally supply any of the [chutzpah command line options](https://github.com/mmanela/chutzpah/wiki/command-line-options), except `path`. 
 
