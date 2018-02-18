@@ -48,10 +48,12 @@ var isValidProperty = function(baseOpts, userOpts, propertyName){
             );
 };
 
-var getCommandLineOptionArgString = function(opts, files){
+var getCommandLineOptionArgString = function(opts, files, isSettingsFile){
     var arg = "";
     files = files || [];
 
+	validateSettingsFile(files, isSettingsFile);
+	
     for (var key in opts) {
         if (!opts.hasOwnProperty(key)) 
             continue;
@@ -64,11 +66,24 @@ var getCommandLineOptionArgString = function(opts, files){
             arg += " /" + key + " " + opts[key];                
     }
     
-    files.forEach(function(file) {
-        arg += " /path \"" + file + "\"";
-    }, this);
+    if (isSettingsFile) {
+        arg = ' ' + files[0] + arg;
+    } else {
+        files.forEach(function(file) {
+            arg += " /path \"" + file + "\"";
+        }, this);
+    }
     
     return arg;
+};
+
+var validateSettingsFile = function(files, isSettingsFile){
+	if(isSettingsFile && (files.length !== 1 || !files[0].endsWith('.json'))){
+		throw new gutil.PluginError({
+			plugin: "gulp-chutzpah",
+			message: "gulp-chutzpah: invalid chutzpah.json settings file specified in the source stream."
+		});
+    }
 };
 
 var chutzpahRunner = function(userOpts){
@@ -91,7 +106,7 @@ var chutzpahRunner = function(userOpts){
             callback(null, file);
         },
         function(callback){
-            var args = getCommandLineOptionArgString(opts, files);
+            var args = getCommandLineOptionArgString(opts, files, userOpts.isSettingsFile);
             exec(userOpts.executable + args, function(err, stdout, stderr){
                 console.log(stdout);
                 console.error(stderr);
