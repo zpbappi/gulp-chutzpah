@@ -6,9 +6,30 @@ var gulp = require("gulp"),
     proxyquire = require("proxyquire"),
     chutzpah = require("./index.js");
 
+var PATH_TO_CHUTZPAH = "/path/to/chutzpah.runner.exe";
+
 
 function getChutzpahWithProxy(proxyObj){
     return proxyquire("./index.js", proxyObj);
+};
+
+function getCommandStringPromise(optionalConfigs, sourceFiles){
+    sourceFiles = sourceFiles || "index.js";
+
+    var deferred = Q.defer();
+    var chutzpah = getChutzpahWithProxy({"child_process": {"exec": function(command){
+        deferred.resolve(command);
+    }}});
+    
+    if(typeof optionalConfigs.executable !== "string")
+        optionalConfigs.executable = PATH_TO_CHUTZPAH
+    
+    gulp.src(sourceFiles)
+    .pipe(chutzpah(optionalConfigs))
+    .pipe(assert.end(function(){}))
+    .end();
+    
+    return deferred.promise;
 };
     
 
@@ -31,7 +52,7 @@ describe("gulp-chutzpah", function(){
         
         it("should not throw when `executable` is specified", function(){
             (function(){
-                chutzpah({executable: "/path/to/chutzpah.runner.exe"})
+                chutzpah({executable: PATH_TO_CHUTZPAH})
             }).should.not.throw();
         });
     });
@@ -43,7 +64,7 @@ describe("gulp-chutzpah", function(){
         beforeEach(function(){
             var chutzpah = getChutzpahWithProxy({ "child_process": {"exec": function() {} } });
             pluginStream = chutzpah({
-                "executable": "/path/to/chutzpah.runner.exe"
+                "executable": PATH_TO_CHUTZPAH
             });
         });
         
@@ -103,24 +124,6 @@ describe("gulp-chutzpah", function(){
     
     describe("when considering chutzpah configuration", function(){
         
-        function getCommandStringPromise(optionalConfigs){
-            var deferred = Q.defer();
-            var chutzpah = getChutzpahWithProxy({"child_process": {"exec": function(command){
-                deferred.resolve(command);
-            }}});
-            
-            if(typeof optionalConfigs.executable !== "string")
-                optionalConfigs.executable = "/path/to/chutzpah.runner.exe"
-            
-            gulp.src("index.js")
-            .pipe(chutzpah(optionalConfigs))
-            .pipe(assert.end(function(){}))
-            .end();
-            
-            return deferred.promise;
-        };
-        
-        
         it("should ignore unknown parameters", function(){
             return getCommandStringPromise({
                 "who-am-i": "dont-know"
@@ -156,6 +159,26 @@ describe("gulp-chutzpah", function(){
             .and.containEql(" /openInBrowser")
             .and.containEql(" /coverage")
             .and.containEql(" /coveragehtml /path/to/coverage.html");
+        });
+    });
+
+    describe("when using chutzpah with settings file", function() {
+        it("should generate proper command", function() {
+            return getCommandStringPromise({
+                isSettingsFile: true
+            }, "package.json")
+            .should.eventually.containEql(PATH_TO_CHUTZPAH)
+            .and.containEql("package.json");
+        });
+
+        it("should ignore all other settings", function() {
+            return getCommandStringPromise({
+                isSettingsFile: true,
+                "parallelism": 4,
+                "openInBrowser": true
+            }, "package.json")
+            .should.eventually.not.containEql("/parallelism")
+            .and.not.containEql("/openInBrowser");
         });
     });
 });

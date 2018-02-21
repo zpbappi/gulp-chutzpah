@@ -9,6 +9,8 @@ npm install gulp-chutzpah
 
 ## Usage
 
+### ...with the test files
+
 ```node
 var gulp = require("gulp"),
     chutzpah = require("gulp-chutzpah");
@@ -23,6 +25,23 @@ gulp.task("test", function(){
 });
 ```
 
+### ...with chutzpah settings file
+
+```node
+var gulp = require("gulp"),
+    chutzpah = require("gulp-chutzpah");
+
+var opts = {
+    executable: "/path/to/chutzpah.console.exe",
+    isSettingsFile: true
+};
+
+gulp.task("test", function(){
+    gulp.src("/path/to/chutzpah-settings.json")
+    .pipe(chutzpah(opts));
+});
+```
+
 ## Options
 
 The options object must have a property named `executable`, which is the location of 
@@ -33,6 +52,7 @@ You can optionally supply any of the [chutzpah command line options](https://git
 Here are the options again with their default values:
 
 - `executable` : __Required__. "/path/to/chutzpah.console.exe".
+- `isSettingsFile` : __Conditionally required__. Must set to `true` when using chutzpah settings files to specify test files and/or other settings. Detail about the json settings file can be found [here](https://github.com/mmanela/chutzpah/wiki/Chutzpah.json-Settings-File). *Important:*  when this value is set to `true`, all other settings are ignored (except of course, executable). Default is `false`. 
 - `nologo` : Do not show the copyright message. Default is `false`.
 - `silent` : Do not output running test count. Default is `false`.
 - `teamcity` : Forces TeamCity mode (normally auto-detected). Default is `false`.
