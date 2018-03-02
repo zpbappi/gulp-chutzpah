@@ -87,6 +87,10 @@ var validateSettingsFile = function(files) {
   }
 };
 
+var getExecOptions = function (userOpts) {
+    return userOpts.execOptions || {};
+}
+
 var chutzpahRunner = function(userOpts) {
   if (
     !userOpts ||
@@ -118,7 +122,7 @@ var chutzpahRunner = function(userOpts) {
         files,
         userOpts.isSettingsFile
       );
-      exec(userOpts.executable + args, function(err, stdout, stderr) {
+      exec(userOpts.executable + args, getExecOptions(userOpts), function(err, stdout, stderr) {
         console.log(stdout);
         console.error(stderr);
         callback(err);
