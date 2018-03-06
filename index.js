@@ -87,11 +87,11 @@ var validateSettingsFile = function(files) {
   }
 };
 
-var getExecOptions = function (userOpts) {
-    return userOpts.execOptions || {};
+var getExecOptions = function (execOpts) {
+    return execOpts || {};
 }
 
-var chutzpahRunner = function(userOpts) {
+var chutzpahRunner = function(userOpts, execOpts) {
   if (
     !userOpts ||
     typeof userOpts["executable"] !== "string" ||
@@ -122,7 +122,7 @@ var chutzpahRunner = function(userOpts) {
         files,
         userOpts.isSettingsFile
       );
-      exec(userOpts.executable + args, getExecOptions(userOpts), function(err, stdout, stderr) {
+      exec(userOpts.executable + args, getExecOptions(execOpts), function(err, stdout, stderr) {
         console.log(stdout);
         console.error(stderr);
         callback(err);
