@@ -13,28 +13,29 @@ function getChutzpahWithProxy(proxyObj){
     return proxyquire("./index.js", proxyObj);
 };
 
-function getCommandStringPromise(optionalConfigs, sourceFiles){
+function getCommandPromise(optionalConfigs, sourceFiles, execOptions){
     sourceFiles = sourceFiles || "index.js";
+    execOptions = execOptions || {};
 
     var deferred = Q.defer();
-    var chutzpah = getChutzpahWithProxy({"child_process": {"exec": function(command){
-        deferred.resolve(command);
+    var chutzpah = getChutzpahWithProxy({"child_process": {"exec": function(command, opts){
+        deferred.resolve({ command: command, opts: opts });
     }}});
     
     if(typeof optionalConfigs.executable !== "string")
         optionalConfigs.executable = PATH_TO_CHUTZPAH
     
     gulp.src(sourceFiles)
-    .pipe(chutzpah(optionalConfigs))
+    .pipe(chutzpah(optionalConfigs, execOptions))
     .pipe(assert.end(function(){}))
     .end();
     
     return deferred.promise;
 };
-    
+
 
 describe("gulp-chutzpah", function(){
-    
+
     describe("when calling chutzpah()", function(){
         const pluginErrorMessage = "gulp-chutzpah: path to chutzpah runner must be specified using the property named 'executable'.";
         
@@ -125,60 +126,105 @@ describe("gulp-chutzpah", function(){
     describe("when considering chutzpah configuration", function(){
         
         it("should ignore unknown parameters", function(){
-            return getCommandStringPromise({
+            return getCommandPromise({
                 "who-am-i": "dont-know"
-            }).should.eventually.not.containEql("who-am-i");                     
+            }).then(function (data) {
+                data.command.should.not.containEql("who-am-i");
+            });
         });
         
         it("should work with boolean parameters", function(){
-            return getCommandStringPromise({
+            return getCommandPromise({
                 "silent": true
-            }).should.eventually.containEql(" /silent");
+            }).then(function (data) {
+                data.command.should.containEql(" /silent");
+            });
         });
         
         it("should work with optional value parameters without any specific value", function(){
-            return getCommandStringPromise({
+            return getCommandPromise({
                 "openInBrowser": true
-            }).should.eventually.containEql(" /openInBrowser");
+            }).then(function (data) {
+                data.command.should.containEql(" /openInBrowser");
+            });
         });
         
         it("should work with optional value parameters with specific value", function(){
-            return getCommandStringPromise({
+            return getCommandPromise({
                 "openInBrowser": "Chrome"
-            }).should.eventually.containEql(" /openInBrowser Chrome");
+            }).then(function (data) {
+                data.command.should.containEql(" /openInBrowser Chrome");
+            });
         });
         
         it("should work with different types of parameters together", function(){
-            return getCommandStringPromise({
+            return getCommandPromise({
                 "parallelism": 4,
                 "openInBrowser": true,
                 "coverage": true,
                 "coveragehtml": "/path/to/coverage.html" 
-            })
-            .should.eventually.containEql(" /parallelism 4")
-            .and.containEql(" /openInBrowser")
-            .and.containEql(" /coverage")
-            .and.containEql(" /coveragehtml /path/to/coverage.html");
+            }).then(function (data) {
+                data.command.should.containEql(" /parallelism 4")
+                    .and.containEql(" /openInBrowser")
+                    .and.containEql(" /coverage")
+                    .and.containEql(" /coveragehtml /path/to/coverage.html");
+            });
         });
     });
 
     describe("when using chutzpah with settings file", function() {
         it("should generate proper command", function() {
-            return getCommandStringPromise({
+            return getCommandPromise({
                 isSettingsFile: true
             }, "package.json")
-            .should.eventually.containEql(PATH_TO_CHUTZPAH)
-            .and.containEql("package.json");
+            .then(function (data) {
+                data.command.should.containEql(PATH_TO_CHUTZPAH)
+                    .and.containEql("package.json");
+            });
         });
 
         it("should ignore all other settings", function() {
-            return getCommandStringPromise({
+            return getCommandPromise({
                 isSettingsFile: true,
                 "parallelism": 4,
                 "openInBrowser": true
             }, "package.json")
-            .should.eventually.not.containEql("/parallelism")
-            .and.not.containEql("/openInBrowser");
+            .then(function (data) {
+                data.command.should.not.containEql("/parallelism")
+                    .and.not.containEql("/openInBrowser");
+            });
         });
+    });
+
+    describe("when using chutzpah with child_process.exec options", function () {
+
+        var optionalConfigDummy = {},
+            execOptionsEmptyStub = {};
+
+        it("should call child_process.exec with specified options", function () {
+            var maxBufferDummy = 10000 * 1024,
+                execOptionsWithMaxBufferStub = {
+                    maxBuffer: maxBufferDummy
+                };
+            return getCommandPromise(optionalConfigDummy, "package.json", execOptionsWithMaxBufferStub)
+                .then(function (data) {
+                    data.opts.should.containEql(execOptionsWithMaxBufferStub);
+                });
+        });
+
+        it("should ignore undefined options", function () {
+            return getCommandPromise(optionalConfigDummy, "package.json")
+                .then(function (data) {
+                    data.opts.should.containEql(execOptionsEmptyStub);
+                });
+        });
+
+        it("should ignore null options", function () {
+            return getCommandPromise(optionalConfigDummy, "package.json", null)
+                .then(function (data) {
+                    data.opts.should.containEql(execOptionsEmptyStub);
+                });
+        });
+
     });
 });
