@@ -42,6 +42,26 @@ gulp.task("test", function(){
 });
 ```
 
+### ...with exec options (optional)
+```node
+var opts = {
+    executable: "/path/to/chutzpah.console.exe"
+    // other options
+};
+
+var execOptions = {
+    encoding: 'utf8',
+    timeout: 0,
+    maxBuffer: 200 * 1024
+    // other exec options
+}
+
+gulp.task("test", function(){
+    gulp.src("/my/test/files.extention")
+    .pipe(chutzpah(opts, execOptions));
+});
+```
+
 ## Options
 
 The options object must have a property named `executable`, which is the location of 
@@ -74,3 +94,7 @@ Specify more than one to add multiple environments. Example value: `"settingsFil
 - `trx` : output results to Visual Studio Trx file. Default is `""`. Set a file path to generate the file. 
 - `nunit2` : output results to NUnit-style XML file. Default is `""`. Set a file path to generate the file.
 - `coveragehtml` : Outputs default Chutzpah coverage HTML. Default is `""`. Set a file path to generate the file.
+
+## Exec Options
+
+This is optional second parameter to `chutzpah()`. Default options can be found [here](https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback).

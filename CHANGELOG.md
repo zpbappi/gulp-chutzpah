@@ -1,5 +1,8 @@
 # Change logs
 
+#1.5.0
+- Added support for child_process.exec options (issue # 6). This is optional and a non-breaking change. Thanks again @irega.
+
 ## v1.4.0
 - Added support for chutzpah settings file (issue # 4). Thanks to @irega.
 
